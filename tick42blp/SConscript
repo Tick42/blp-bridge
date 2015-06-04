@@ -1,0 +1,74 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import os
+Import('*')
+env = env.Clone()
+
+target_name = 'libmamatick42blpimpl'
+
+incPath = []
+incPath.append('.')
+incPath.append(os.path.join(blp_prefix, 'include'))
+incPath.append(boost_inc_prefix)
+incPath.append(os.path.join(openmama_src_prefix, 'common', 'c_cpp', 'src', 'c'))
+incPath.append(os.path.join(openmama_src_prefix, 'mama', 'c_cpp', 'src', 'c'))
+incPath.append(os.path.join(openmama_src_prefix, 'mama', 'c_cpp', 'src', 'c'))
+incPath.append(uuid_prefix)
+
+env['CCFLAGS'] = [x for x in env['CCFLAGS'] if x != '-pedantic-errors']
+env['CCFLAGS'].append('-std=c++0x')
+if build=='debug':
+    env['CCFLAGS'].append('-g')
+
+libPath = []
+libPath.append(os.path.join(blp_prefix, 'lib'))
+libPath.append(openmama_lib_prefix)
+libPath.append(boost_lib_prefix) 
+
+env.Append(LIBS=['blpapi3_64', 'mama', 'm', 'wombatcommon', 'uuid', 'boost_date_time', 'boost_filesystem', 'boost_system', 'boost_thread'],
+           LIBPATH=libPath, CPPPATH=incPath)
+
+conf = Configure(env, config_h=os.path.join('.', 'config.h'), log_file=os.path.join('.', 'config.log'))
+
+if not env.GetOption('clean'):
+    if not conf.CheckCHeader(os.path.join('uuid', 'uuid.h')):
+        print '+- libuuid-devel required'
+        Exit(1)
+env = conf.Finish()
+
+sources = Split("""
+	blpbridgesubscription.cpp        
+	blpdictionaryutils.cpp           
+	blpenvironment.cpp               
+	blpfilesystem.cpp                
+	blpitem.cpp                      
+	blpresponseeventhandler.cpp      
+	blpservice.cpp                   
+	blpsession.cpp                   
+	BlpSubscription.cpp              
+	blpsubscriptioneventhandler.cpp  
+	blpsystemglobal.cpp              
+	blpthreadutil.cpp                
+	blptimeutils.cpp                 
+	blputils.cpp                     
+	bridge.cpp                       
+	io.cpp                           
+	msg.cpp                          
+	publisher.cpp                    
+	queue.cpp                        
+	stdafx.cpp                       
+	subinitial.cpp                   
+	timer.cpp                        
+	transportbridge.cpp              
+""")
+
+lib = env.SharedLibrary(target_name, sources)
+Alias('install', env.Install(lib_prefix, lib))
+# Install quirk:
+# From the manual: "Note, however, that installing a file is still considered a type of file "build." This is 
+# important when you remember that the default behavior of SCons is to build files in or below the current directory."
+# see: http://www.scons.org/doc/1.2.0/HTML/scons-user/c2848.html# I tested this behavior and it seems to follow the description above
+# So, if 'lib_prefix' is local directory it will be installed with or without the 'install' option, otherwise
+# if the 'lib_prefix' is above the local directory, then an 'install' option must be added in order to install
+# the libraries in a different place (above).
+# I use that to get default behavior for lib/build install of libraries.

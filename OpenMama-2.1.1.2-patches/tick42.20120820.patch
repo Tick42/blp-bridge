@@ -1,0 +1,47 @@
+diff --git a/mama/c_cpp/src/c/mama/middleware.h b/mama/c_cpp/src/c/mama/middleware.h
+index 1ae80b7..acf5f9e 100644
+--- a/mama/c_cpp/src/c/mama/middleware.h
++++ b/mama/c_cpp/src/c/mama/middleware.h
+@@ -37,7 +37,8 @@ typedef enum mamaMiddleware_
+     MAMA_MIDDLEWARE_LBM     = 1,
+     MAMA_MIDDLEWARE_TIBRV   = 2,
+     MAMA_MIDDLEWARE_AVIS    = 3,
+-    MAMA_MIDDLEWARE_MAX     = 4,
++	MAMA_MIDDLEWARE_TICK42BLP = 4,
++    MAMA_MIDDLEWARE_MAX     = 5,
+     MAMA_MIDDLEWARE_UNKNOWN = 99
+ } mamaMiddleware;
+ 
+diff --git a/mama/c_cpp/src/c/middleware.c b/mama/c_cpp/src/c/middleware.c
+index 2353309..c2b5db0 100644
+--- a/mama/c_cpp/src/c/middleware.c
++++ b/mama/c_cpp/src/c/middleware.c
+@@ -38,8 +38,12 @@ mamaMiddleware_convertFromString (const char*  str)
+     if (strcasecmp (str, "tibrv") == 0)
+         return MAMA_MIDDLEWARE_TIBRV;
+ 
+-    if (strcasecmp (str, "avis") == 0)
+-        return MAMA_MIDDLEWARE_AVIS;
++	if (strcasecmp (str, "avis") == 0)
++		return MAMA_MIDDLEWARE_AVIS;
++
++	if (strcasecmp (str, "tick42blp") == 0)
++		return MAMA_MIDDLEWARE_TICK42BLP;
++
+ 
+ 
+     return MAMA_MIDDLEWARE_UNKNOWN;
+@@ -57,8 +61,11 @@ mamaMiddleware_convertToString (mamaMiddleware  middleware)
+             return "lbm";
+         case MAMA_MIDDLEWARE_TIBRV:
+             return "tibrv";
+-        case MAMA_MIDDLEWARE_AVIS:
+-            return "AVIS";
++		case MAMA_MIDDLEWARE_AVIS:
++			return "AVIS";
++		case MAMA_MIDDLEWARE_TICK42BLP:
++			return "tick42blp";
++
+         default:
+             return "unknown";
+     }

@@ -1,0 +1,26 @@
+diff --git a/mama/c_cpp/src/c/mama/msg.h b/mama/c_cpp/src/c/mama/msg.h
+index 5094ac9..708f301 100644
+--- a/mama/c_cpp/src/c/mama/msg.h
++++ b/mama/c_cpp/src/c/mama/msg.h
+@@ -47,6 +47,7 @@ typedef enum mamaPayloadType_
+     MAMA_PAYLOAD_FAST       = 'F',
+     MAMA_PAYLOAD_V5         = '5',
+     MAMA_PAYLOAD_AVIS       = 'A',
++	MAMA_PAYLOAD_TICK42BLP  = 'B',
+     MAMA_PAYLOAD_UNKNOWN    = 'U'
+ } mamaPayloadType;
+ 
+diff --git a/mama/c_cpp/src/c/msg.c b/mama/c_cpp/src/c/msg.c
+index 1daf82f..895472f 100644
+--- a/mama/c_cpp/src/c/msg.c
++++ b/mama/c_cpp/src/c/msg.c
+@@ -371,6 +371,9 @@ mamaPayload_convertToString (mamaPayloadType payloadType)
+             return "V5";
+         case MAMA_PAYLOAD_AVIS:
+             return "AVIS";
++		case MAMA_PAYLOAD_TICK42BLP:
++			return "TICK42BLP";
++
+         default:
+             return "unknown";
+     }

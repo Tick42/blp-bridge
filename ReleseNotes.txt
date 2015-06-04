@@ -1,0 +1,40 @@
+Legend: 
+chg:		 what is the change: [fix] for bug fix, [req] for rquierment/feature
+tkt:		 ticket number in Jira, All tickets are related to OpenMAMA in Jira, see https://jira.pirinsoft.bg/browse/OPENMAMA
+project:	 project name in solution 
+description: breif description of the change
+
+ chg  tkt   project	      description
+-----+-----+-------------+---------------------------------------------------------------------------------------------------------
+[req]    75               Cmake build script is complete and cleaned (inlcuding support C++0x, uuid for Unices and alike, support for Boost & blpapi.)
+[fix]    77 tick42blp:    Converting the project to be cross platform. Moving non-platform dependant parts from stdafx.h to common.h. stdafx.h is implicitly #included in Windows builds.
+[fix]       tick42blp:    Post Build support the use of $(ProjectDir) as parameter %3 for UpdateLibs.cmd and UpdateLibsRelease.cmd instead of using relative path.
+[fix]    60 tick42blp:    Subscribe when session is not started throws exception. Status is returned on unseccesfull subscription along with an appropriete log
+[fix]    71 tick42blp:    [Need further test with Linux] Improve handling of field mapping file location. When the fieldmap.csv comes without a path (relative) the system try to 
+                          look for it in current directory if not found then it looks for it in the WOMBAT_PATH
+[req]       tick42blp:    Source code dodumentation for the added features and fixes.
+[req]       tick42blp:    tick42blp.vcxproj.user if removed from source control and the debug options became default for the project and they use only
+                          mamalistenc as default debug process to work with. That make it easy to debug other clients like View42 and leaving some sort 
+						  working debug options for other developers.
+[fix]    61 tick42blp:    Date Time Conversion Issues. settings the Date, Time and DateTime fields to follow the OpenMAMA convention from Bloomberg convetion
+[req]    60 tick42blp:    [Needs more tests] Subscribe when session is not started throws exception. Creating, cleaning and subscribing of sesion is now safe (with try...catch and error results to the calling functions)
+[req]       tick42blp:    Add reference count of owner for blpItem
+[req]       tick42blp:    Added synchronization between bridge (on close) and Bloomberg (process event). making sure the process event stays valid till the end of the process-event.
+[req]       tick42blp:    Added thin wrapper class library to support interlocked integer and semaphore
+[fix]    70 tick42blp:    Fix a crash on the project that happens asynchronously once in a while on shutdown
+[req]    65 tick42blp:    Add configuration options to control whether fields from the csv file only are included in the dictionary. (see new fields in under the Dictionary section in mama.properties)
+[req]    58 tick42blp:    Publish dictionary to Open MAMA
+[fix]    63 tick42blpmsg: Use fids in the blp payload implementation
+[fix]    68 tick42blpmsg: Correct the implementation of the blp payload field class
+[fix]       tick42blp:    moved non-translated-fileds-fid-generator to the right place in code
+[fix]       tick42blp:    moved file initialization process of the internal dictionary to the dictionary object. Thus, symplifing the transport intialization.
+[fix]    61 tick42blp:    Date Time Conversion Issues - preliminary support for date only type 
+[req]       tick42blp:    added support for arbitrary FID (above id 5000) for non-translated fields
+[req]       tick42blp:    added support for special type conversion (from dictionary) 
+[fix]    57 tick42blp:    extra logs for issues (transport & dictionary load)
+[fix]       tick42blp:    (Tom) add sequence number (see fix in code) 
+[req]    57 tick42blp:    Build internal representation of data dictionary and field mappings
+[req]    55 tick42blp:    Create csv file for Bloomberg to wombat field mappings
+[fix]       tick42blp:    each item string is trimmed in BlpItem::ParseFieldList
+[fix]       tick42blp:    tokenizer changed to boost library in BlpItem::ParseFieldList
+

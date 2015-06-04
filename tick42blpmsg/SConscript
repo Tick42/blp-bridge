@@ -1,0 +1,41 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import os
+Import('*')
+env = env.Clone()
+
+target = 'libmamatick42blpmsgimpl'
+
+includePath = []
+includePath.append('.')
+includePath.append(os.path.join(blp_prefix, 'include'))
+includePath.append(boost_inc_prefix)
+
+includePath.append(os.path.join(openmama_src_prefix, 'common', 'c_cpp', 'src', 'c'))
+includePath.append(os.path.join(openmama_src_prefix, 'mama', 'c_cpp', 'src', 'c'))
+includePath.append(os.path.join(openmama_src_prefix, 'mama', 'c_cpp', 'src', 'c'))
+
+includePath.append(uuid_prefix)
+
+libPath = []
+libPath.append(os.path.join(blp_prefix, 'lib'))
+libPath.append(openmama_lib_prefix)
+libPath.append(boost_lib_prefix) 
+
+env['CCFLAGS'] = [x for x in env['CCFLAGS'] if x != '-pedantic-errors']
+env['CCFLAGS'].append('-std=c++0x')
+if build=='debug':
+    env['CCFLAGS'].append('-g')
+
+env.Append(LIBS=['blpapi3_64', 'mama', 'm', 'wombatcommon', 'boost_date_time', 'boost_filesystem', 'boost_system', 'boost_thread'], LIBPATH=libPath,
+           CPPPATH=[includePath])
+
+sources = Split("""
+    blpmsgimpl.cpp
+    blpmsgutils.cpp
+    blppayloadimpl.cpp
+""")
+
+lib = env.SharedLibrary(target, sources)
+Alias('install', env.Install(lib_prefix, lib)) 
