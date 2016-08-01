@@ -81,54 +81,25 @@ tick42blpmsgPayloadIter_get          (msgPayloadIter  iter,
 * bridge functions
 *******************************************************************************/
 extern mama_status
-tick42blpmsgPayload_destroyImpl (mamaPayloadBridge mamaPayloadBridge)
+tick42blpmsgPayload_init(mamaPayloadBridge payloadBridge, char* identifier)
 {
-	/* Returns. */
-    mama_status ret = MAMA_STATUS_NULL_ARG;
-    if(NULL != mamaPayloadBridge)
-    {
-        /* Get the impl. */
-        mamaPayloadBridgeImpl *impl = (mamaPayloadBridgeImpl *)mamaPayloadBridge;
+    mama_status resultStatus = MAMA_STATUS_OK;
 
-        /* Free the impl. */
-        free(impl);
-    }
+    /* Will set the bridge's compile time MAMA version */
+    MAMA_SET_BRIDGE_COMPILE_TIME_VERSION("tick42blpmsg");
 
-    return ret;
-}
-
-extern mama_status
-tick42blpmsgPayload_createImpl (mamaPayloadBridge* result, char* identifier)
-{
-	mamaPayloadBridgeImpl*       impl    = NULL;
-    mama_status             resultStatus = MAMA_STATUS_OK;
-
-    if (!result) return MAMA_STATUS_NULL_ARG;
-
-    impl = (mamaPayloadBridgeImpl*)calloc (1, sizeof (mamaPayloadBridgeImpl));
-    if (!impl)
-    {
-        mama_log (MAMA_LOG_LEVEL_SEVERE, "tick42blpmsgPayload_createImpl(): "
-                  "Could not allocate memory for payload impl.");
-        return MAMA_STATUS_NULL_ARG;
-    }
-
-    INITIALIZE_PAYLOAD_BRIDGE (impl, tick42blpmsg);
-	impl->msgPayloadCreate = tick42blpmsgPayload_create; 
-
-    impl->mClosure = NULL;
-
-    *result     = (mamaPayloadBridge)impl;
-    *identifier = MAMA_PAYLOAD_TICK42BLP;
+    *identifier = (char)MAMA_PAYLOAD_TICK42BLP;
 
     return resultStatus;
 }
 
+MAMAIgnoreDeprecatedOpen
 mamaPayloadType
-tick42blpmsgPayload_getType ()
+tick42blpmsgPayload_getType (void)
 {
     return MAMA_PAYLOAD_TICK42BLP;
 }
+MAMAIgnoreDeprecatedClose
 
 /******************************************************************************
 * general functions
@@ -143,8 +114,8 @@ tick42blpmsgPayload_create (msgPayload* msg)
 
     *msg = (msgPayload)newPayload;
 
-	// init the fid map here
-	InitFidMap();
+    // init the fid map here
+    InitFidMap();
 
     return MAMA_STATUS_OK;
 }
@@ -158,14 +129,14 @@ tick42blpmsgPayload_createForTemplate (msgPayload*         msg,
 }
 
 mama_status
-tick42blpmsgPayload_createFromByteBuffer(msgPayload* msg, 
-								   mamaPayloadBridge bridge, 
-								   const void* buffer, mama_size_t bufferLength)
+tick42blpmsgPayload_createFromByteBuffer(msgPayload* msg,
+                                   mamaPayloadBridge bridge,
+                                   const void* buffer, mama_size_t bufferLength)
 {
     if (!msg)  return MAMA_STATUS_NULL_ARG;
 
     BlpPayload* newPayload = new (std::nothrow) BlpPayload();
-	
+
     *msg = (msgPayload)newPayload;
 
     return MAMA_STATUS_OK;
@@ -175,28 +146,28 @@ mama_status
 tick42blpmsgPayload_copy              (const msgPayload    msg,
                                  msgPayload*         copy)
 {
-	CHECK_PAYLOAD(msg);
-	const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    CHECK_PAYLOAD(msg);
+    const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
 
-	BlpPayload* newPayload = reinterpret_cast<BlpPayload*>(*copy);
+    BlpPayload* newPayload = reinterpret_cast<BlpPayload*>(*copy);
 
-	if (!newPayload)
-	{
-		newPayload = new (std::nothrow) BlpPayload(*payload);
+    if (!newPayload)
+    {
+        newPayload = new (std::nothrow) BlpPayload(*payload);
 
-		if (!newPayload)
-		{
-			return MAMA_STATUS_PLATFORM;
-		}
+        if (!newPayload)
+        {
+            return MAMA_STATUS_PLATFORM;
+        }
 
-	}
-	else
-	{
-		*newPayload = *payload;
-	}
+    }
+    else
+    {
+        *newPayload = *payload;
+    }
 
-	*copy = reinterpret_cast<msgPayload*>(newPayload);
-	return MAMA_STATUS_OK;
+    *copy = reinterpret_cast<msgPayload*>(newPayload);
+    return MAMA_STATUS_OK;
 }
 
 mama_status
@@ -204,13 +175,13 @@ tick42blpmsgPayload_clear             (msgPayload          msg)
 {
     CHECK_PAYLOAD(msg);
 
-	BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
-	if (!payload)
-	{
-		return MAMA_STATUS_PLATFORM;
-	}
+    BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    if (!payload)
+    {
+        return MAMA_STATUS_PLATFORM;
+    }
 
-	payload->clear();
+    payload->clear();
 
     return MAMA_STATUS_OK;
 }
@@ -220,19 +191,19 @@ tick42blpmsgPayload_destroy           (msgPayload          msg)
 {
     CHECK_PAYLOAD(msg);
 
-	const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
-	if (!payload)
-	{
-		return MAMA_STATUS_PLATFORM;
-	}
+    const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    if (!payload)
+    {
+        return MAMA_STATUS_PLATFORM;
+    }
 
-	delete payload;
+    delete payload;
 
     return MAMA_STATUS_OK;
 }
 
 mama_status
-tick42blpmsgPayload_setParent (msgPayload          msg,                           
+tick42blpmsgPayload_setParent (msgPayload          msg,
                         const mamaMsg       parent)
 {
     return MAMA_STATUS_OK;
@@ -268,11 +239,11 @@ tick42blpmsgPayload_getByteBuffer     (const msgPayload    msg,
                                 const void**        buffer,
                                 mama_size_t*        bufferLength)
 {
- 	CHECK_PAYLOAD(msg);
-	const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    CHECK_PAYLOAD(msg);
+    const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
 
-	*buffer = payload;
-	*bufferLength = sizeof(BlpPayload);
+    *buffer = payload;
+    *bufferLength = sizeof(BlpPayload);
     return MAMA_STATUS_OK;
 }
 
@@ -300,8 +271,8 @@ tick42blpmsgPayload_getNumFields      (const msgPayload    msg,
 {
     CHECK_PAYLOAD(msg);
 
-	const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
-	*numFields = payload->numFields();
+    const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    *numFields = payload->numFields();
     return MAMA_STATUS_OK;
 }
 
@@ -318,13 +289,13 @@ tick42blpmsgPayload_iterateFields (const msgPayload        msg,
                             mamaMsgIteratorCb       cb,
                             void*                   closure)
 {
-	CHECK_PAYLOAD(msg);
+    CHECK_PAYLOAD(msg);
 
-	const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
-	if (!payload)
-	{
-		return MAMA_STATUS_PLATFORM;
-	}
+    const BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    if (!payload)
+    {
+        return MAMA_STATUS_PLATFORM;
+    }
 
     return payload->iterateFields(field, cb, closure);
 }
@@ -358,7 +329,7 @@ tick42blpmsgPayload_getNativeMsg     (const msgPayload    msg,
                                void**              nativeMsg)
 {
     CHECK_PAYLOAD(msg);
-	    *nativeMsg = msg;
+        *nativeMsg = msg;
     return MAMA_STATUS_OK;
 }
 
@@ -1279,9 +1250,9 @@ tick42blpmsgPayload_getField          (const msgPayload    msg,
     CHECK_PAYLOAD(msg);
     CHECK_NAME(name, fid);
 
-	BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
+    BlpPayload* payload = reinterpret_cast<BlpPayload*>(msg);
 
-	return payload->getField(fid, result);
+    return payload->getField(fid, result);
 }
 
 mama_status
@@ -1522,7 +1493,7 @@ tick42blpmsgPayloadIter_create        (msgPayloadIter* iter,
                                 msgPayload      msg)
 {
     CHECK_PAYLOAD(msg);
-	return MAMA_STATUS_OK;
+    return MAMA_STATUS_OK;
 }
 
 msgFieldPayload
@@ -1599,45 +1570,45 @@ tick42blpmsgFieldPayload_getName      (const msgFieldPayload   field,
                                 mamaFieldDescriptor     desc,
                                 const char**            result)
 {
-	mama_fid_t fid =0;
-	CHECK_FIELD(field);
+    mama_fid_t fid =0;
+    CHECK_FIELD(field);
 
-	const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
+    const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
 
-	fid = atoi(fieldPayload->name_.c_str());
+    fid = atoi(fieldPayload->name_.c_str());
 
-	if (fid!=0)
-	{
-		if (!desc)
-		{
-			if (dict)
-			{
-				mama_status status = MAMA_STATUS_OK;
-				if(MAMA_STATUS_OK!=
-					(status=mamaDictionary_getFieldDescriptorByFid
-					(dict,
-					&desc,
-					fid)))
-				{
-					return status;
-				}
-				*result = mamaFieldDescriptor_getName (desc);
-			}
-			else
-			{
-				*result = fieldPayload->name_.c_str();
-			}
-		}
-		else
-			*result = mamaFieldDescriptor_getName (desc);
-	}
-	else
-		*result = fieldPayload->name_.c_str();
+    if (fid!=0)
+    {
+        if (!desc)
+        {
+            if (dict)
+            {
+                mama_status status = MAMA_STATUS_OK;
+                if(MAMA_STATUS_OK!=
+                    (status=mamaDictionary_getFieldDescriptorByFid
+                    (dict,
+                    &desc,
+                    fid)))
+                {
+                    return status;
+                }
+                *result = mamaFieldDescriptor_getName (desc);
+            }
+            else
+            {
+                *result = fieldPayload->name_.c_str();
+            }
+        }
+        else
+            *result = mamaFieldDescriptor_getName (desc);
+    }
+    else
+        *result = fieldPayload->name_.c_str();
 
-	if (!*result)
-		return MAMA_STATUS_INVALID_ARG;
+    if (!*result)
+        return MAMA_STATUS_INVALID_ARG;
 
-	return MAMA_STATUS_OK;
+    return MAMA_STATUS_OK;
 }
 
 mama_status
@@ -1647,8 +1618,8 @@ tick42blpmsgFieldPayload_getFid       (const msgFieldPayload   field,
                                 uint16_t*               result)
 {
     CHECK_FIELD(field);
-	const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	*result = fieldPayload->fid_;
+    const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
+    *result = fieldPayload->fid_;
 
     return MAMA_STATUS_OK;
 }
@@ -1669,8 +1640,8 @@ tick42blpmsgFieldPayload_getType      (msgFieldPayload         field,
 {
     CHECK_FIELD(field);
 
-	const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	*result = fieldPayload->type_;
+    const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
+    *result = fieldPayload->type_;
 
     return MAMA_STATUS_OK;
 }
@@ -1799,8 +1770,8 @@ mama_status
 tick42blpmsgFieldPayload_getBool      (const msgFieldPayload   field,
                                 mama_bool_t*            result)
 {
-	const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1808,7 +1779,7 @@ tick42blpmsgFieldPayload_getChar      (const msgFieldPayload   field,
                                 char*                   result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1816,7 +1787,7 @@ tick42blpmsgFieldPayload_getI8        (const msgFieldPayload   field,
                                 mama_i8_t*              result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1824,7 +1795,7 @@ tick42blpmsgFieldPayload_getU8        (const msgFieldPayload   field,
                                 mama_u8_t*              result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1832,7 +1803,7 @@ tick42blpmsgFieldPayload_getI16       (const msgFieldPayload   field,
                                 mama_i16_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1840,7 +1811,7 @@ tick42blpmsgFieldPayload_getU16       (const msgFieldPayload   field,
                                 mama_u16_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1848,7 +1819,7 @@ tick42blpmsgFieldPayload_getI32       (const msgFieldPayload   field,
                                 mama_i32_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1856,7 +1827,7 @@ tick42blpmsgFieldPayload_getU32       (const msgFieldPayload   field,
                                 mama_u32_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1864,7 +1835,7 @@ tick42blpmsgFieldPayload_getI64       (const msgFieldPayload   field,
                                 mama_i64_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1872,7 +1843,7 @@ tick42blpmsgFieldPayload_getU64       (const msgFieldPayload   field,
                                 mama_u64_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1880,7 +1851,7 @@ tick42blpmsgFieldPayload_getF32       (const msgFieldPayload   field,
                                 mama_f32_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1888,7 +1859,7 @@ tick42blpmsgFieldPayload_getF64       (const msgFieldPayload   field,
                                 mama_f64_t*             result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1896,7 +1867,7 @@ tick42blpmsgFieldPayload_getString    (const msgFieldPayload   field,
                                 const char**            result)
 {
     const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
-	return fieldPayload->get(*result);
+    return fieldPayload->get(*result);
 }
 
 mama_status
@@ -1911,18 +1882,18 @@ mama_status
 tick42blpmsgFieldPayload_getDateTime  (const msgFieldPayload   field,
                                 mamaDateTime            result)
 {
-	const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
+    const BlpFieldPayload* fieldPayload = reinterpret_cast<const BlpFieldPayload*>(field);
 
-	mama_datetime tempdt;
+    mama_datetime tempdt;
 
-	mama_status st = fieldPayload->get( tempdt);
+    mama_status st = fieldPayload->get( tempdt);
 
-	if (st == MAMA_STATUS_OK)
-	{
-		mamaDateTime_setEpochTimeMicroseconds(result, tempdt.dt);
-	}
+    if (st == MAMA_STATUS_OK)
+    {
+        mamaDateTime_setEpochTimeMicroseconds(result, tempdt.dt);
+    }
 
-	return st;
+    return st;
 }
 
 mama_status
@@ -2081,10 +2052,10 @@ tick42blpmsgFieldPayload_getAsString (
 }
 
 extern mama_status
-	tick42blpmsgFieldPayload_updateString
-	(msgFieldPayload         field,
-	msgPayload              msg,
-	const char*             value)
+    tick42blpmsgFieldPayload_updateString
+    (msgFieldPayload         field,
+    msgPayload              msg,
+    const char*             value)
 {
-	return blpField(field)->set(std::string(value));
+    return blpField(field)->set(std::string(value));
 }

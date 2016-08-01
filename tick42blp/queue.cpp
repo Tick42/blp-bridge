@@ -32,18 +32,17 @@
 #include "blpbridgefunctions.h"
 #include <wombat/queue.h>
 #include "blpsystemglobal.h"
-#include "boost/scope_exit.hpp"
 
-typedef struct blpQueueBridge_t 
+typedef struct blpQueueBridge_t
 {
-	mamaQueue          parent_;
+    mamaQueue          parent_;
     wombatQueue        queue_;
     uint8_t            isNative_;
 } blpQueueBridge_t;
 
-typedef struct blpQueueClosure_t 
+typedef struct blpQueueClosure_t
 {
-	blpQueueBridge_t* impl_;
+    blpQueueBridge_t* impl_;
     mamaQueueEventCB cb_;
     void*            userClosure_;
 } blpQueueClosure_t;
@@ -52,7 +51,7 @@ typedef struct blpQueueClosure_t
 #define CHECK_QUEUE(queue) \
         do {  \
            if (blpQueue(queue) == 0) return MAMA_STATUS_NULL_ARG; \
-		   if (blpQueue(queue)->queue_ == NULL) return MAMA_STATUS_NULL_ARG; \
+           if (blpQueue(queue)->queue_ == NULL) return MAMA_STATUS_NULL_ARG; \
         } while(0)
 
 
@@ -105,10 +104,10 @@ tick42blpBridgeMamaQueue_create_usingNative (queueBridge* queue,
 mama_status
 tick42blpBridgeMamaQueue_destroy (queueBridge queue)
 {
-	CHECK_QUEUE(queue);
-	if (blpQueue(queue)->isNative_)
-		wombatQueue_destroy (blpQueue(queue)->queue_);
-	free(blpQueue(queue));
+    CHECK_QUEUE(queue);
+    if (blpQueue(queue)->isNative_)
+        wombatQueue_destroy (blpQueue(queue)->queue_);
+    free(blpQueue(queue));
     return MAMA_STATUS_OK;
 }
 
@@ -149,7 +148,7 @@ tick42blpBridgeMamaQueue_timedDispatch (queueBridge queue, uint64_t timeout)
     status = wombatQueue_timedDispatch (blpQueue(queue)->queue_,
                      NULL, NULL, timeout);
     if (status == WOMBAT_QUEUE_TIMEOUT)
-		return MAMA_STATUS_TIMEOUT;
+        return MAMA_STATUS_TIMEOUT;
 
     if (status != WOMBAT_QUEUE_OK)
     {
@@ -259,7 +258,7 @@ tick42blpBridgeMamaQueue_getNativeHandle (queueBridge queue,
                                      void**      result)
 {
     CHECK_QUEUE(queue);
-	*result = blpQueue(queue)->queue_;
+    *result = blpQueue(queue)->queue_;
     return MAMA_STATUS_OK;
 }
 

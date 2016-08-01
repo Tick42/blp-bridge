@@ -9,7 +9,7 @@ find_path (OPENMAMA_INCLUDE_DIR
 	PATHS
 		$ENV{TICK42_OPENMAMA}
 		$ENV{TICK42_OPENMAMA}/mama/c_cpp/src/c
-		$ENV{API_HOME}/include
+		$ENV{OPENMAMA_API}/include
 		/usr/local/include
 		/usr/include
 		/opt/local/include
@@ -30,7 +30,7 @@ find_path (OPENMAMA_COMMON_INCLUDE_DIR
 	PATHS
 		$ENV{TICK42_OPENMAMA}
 		$ENV{TICK42_OPENMAMA}/common/c_cpp/src/c
-		$ENV{API_HOME}
+		$ENV{OPENMAMA_API}
 	)
 
 message( "OPENMAMA_COMMON_INCLUDE_DIR=${OPENMAMA_COMMON_INCLUDE_DIR}")
@@ -44,7 +44,7 @@ find_path (WOMBAT_OS_DEPENDENT_INCLUDE_DIR
 		windows
 	PATHS
 		$ENV{TICK42_OPENMAMA}/common/c_cpp/src/c
-		$ENV{API_HOME}/include
+		$ENV{OPENMAMA_API}/include
 		/usr/local/include
 		/usr/include
 		/opt/local/include
@@ -63,7 +63,7 @@ find_path (WOMBAT_OS_DEPENDENT_INCLUDE_DIR
 		OPENMAMA_INCLUDE_DIR/common/c_cpp/src/c
 		OPENMAMA_INCLUDE_DIR
 		$ENV{TICK42_OPENMAMA}/include
-		$ENV{API_HOME}/include
+		$ENV{OPENMAMA_API}/include
 		/usr/local/include
 		/usr/include
 		/opt/local/include
@@ -96,7 +96,7 @@ find_library (OPENMAMA_LIBRARIES
 		lib
 	PATHS
 		$ENV{TICK42_OPENMAMA}
-		$ENV{API_HOME}
+		$ENV{OPENMAMA_API}
 		/usr/local
 		/usr
 		/opt/local
@@ -114,7 +114,7 @@ find_library (OPENMAMA_COMMON_LIBRARIES
 		lib
 		PATHS
 		$ENV{TICK42_OPENMAMA}
-		$ENV{API_HOME}
+		$ENV{OPENMAMA_API}
 		/usr/local
 		/usr
 		/opt/local

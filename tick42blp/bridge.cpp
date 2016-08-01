@@ -44,42 +44,30 @@ timerHeap gTimerHeap;
 
 /*Responsible for creating the bridge impl structure*/
 
-// this function *must* have the same name as is enumnerated for the middleware in the mama middleware.c because there is 
-//     snprintf (initFuncName, 256, "%sBridge_createImpl",  middlewareName); in mama_loadBridgeWithPathInternal  in mama.c
-void tick42blpBridge_createImpl (mamaBridge* result)
+mama_status tick42blpBridge_init(mamaBridge bridgeImpl)
 {
-    mamaBridgeImpl* impl = NULL;
-    if (!result) return;
-    *result = NULL;
+    mama_status status = MAMA_STATUS_OK;
 
-    impl = (mamaBridgeImpl*)calloc (1, sizeof (mamaBridgeImpl));
-    if (!impl)
-    {
-        mama_log (MAMA_LOG_LEVEL_SEVERE, "tick42blpBridge_createImpl(): "
-                "Could not allocate mem for impl.");
-        return;
-    }
+    /* Will set the bridge's compile time MAMA version */
+    MAMA_SET_BRIDGE_COMPILE_TIME_VERSION("tick42blp");
 
-	BlpBridgeImpl* blpBridge = new BlpBridgeImpl();
+    // If we need to we can put some object heRE
+    BlpBridgeImpl* blpBridge = new BlpBridgeImpl();
+    mamaBridgeImpl_setClosure(bridgeImpl, blpBridge);
 
-    /*Populate the bridge impl structure with the function pointers*/
-    INITIALIZE_BRIDGE (impl, tick42blp);
-
-    mamaBridgeImpl_setClosure((mamaBridge) impl, blpBridge);
-
-    *result = (mamaBridge)impl;
+    return status;
 }
 
 const char*
-tick42blpBridge_getVersion (void)
+tick42blpBridge_getVersion(void)
 {
     return (const char*) "Unable to get version number";
 }
 
 const char*
-tick42blpBridge_getName (void)
+tick42blpBridge_getName(void)
 {
-    return "blp";
+    return "tick42blp";
 }
 
 // This is non constant array of char that holds the name of the bridge
@@ -88,37 +76,37 @@ tick42blpBridge_getName (void)
 // However it is a MAMA bridge definition (see OpenMAMA documentation) and also:
 // typedef mama_status (*bridge_getDefaultPayloadId)(char***name, char** id);
 
-static char tick42PayloadName[] = "tick42blpmsg"; 
-static char * PAYLOAD_NAMES[] = {tick42PayloadName, NULL};
-static char PAYLOAD_IDS[] = {MAMA_PAYLOAD_TICK42BLP, NULL};
+static char tick42PayloadName[] = "tick42blpmsg";
+static char *PAYLOAD_NAMES[] = {tick42PayloadName, NULL};
+static char PAYLOAD_IDS[] = {MAMA_PAYLOAD_TICK42BLP, 0};
 
 mama_status
 tick42blpBridge_getDefaultPayloadId (char** *name, char** id)
 {
-	*name = PAYLOAD_NAMES;
-	*id = PAYLOAD_IDS;
-    
-	return MAMA_STATUS_OK;
+    *name = PAYLOAD_NAMES;
+    *id = PAYLOAD_IDS;
+
+    return MAMA_STATUS_OK;
 }
 
 static mamaQueue gPublisher_MamaQueue= NULL;
 
 mama_status
-	tick42blpBridge_getTheMamaQueue (mamaQueue* queue)
+    tick42blpBridge_getTheMamaQueue (mamaQueue* queue)
 {
-	if (!gPublisher_MamaQueue)
-		return MAMA_STATUS_NOT_INITIALISED;
+    if (!gPublisher_MamaQueue)
+        return MAMA_STATUS_NOT_INITIALISED;
 
-	*queue = gPublisher_MamaQueue;
+    *queue = gPublisher_MamaQueue;
 
-	return MAMA_STATUS_OK;
+    return MAMA_STATUS_OK;
 }
 
 mama_status
 tick42blpBridge_open (mamaBridge bridgeImpl)
 {
-	// Initialize sockets. Create queues and timers for the Bridge
-	mama_status status = MAMA_STATUS_OK;
+    // Initialize sockets. Create queues and timers for the Bridge
+    mama_status status = MAMA_STATUS_OK;
     mamaBridgeImpl* impl =  (mamaBridgeImpl*)bridgeImpl;
 
     wsocketstartup();
@@ -136,7 +124,7 @@ tick42blpBridge_open (mamaBridge bridgeImpl)
                             "BLP_DEFAULT_MAMA_QUEUE");
 
 
-	gPublisher_MamaQueue = impl->mDefaultEventQueue;
+    gPublisher_MamaQueue = impl->mDefaultEventQueue;
     mama_log (MAMA_LOG_LEVEL_NORMAL,
               "tick42blpBridge_open(): Successfully created tick42blp queue");
 
@@ -160,56 +148,56 @@ tick42blpBridge_open (mamaBridge bridgeImpl)
 mama_status
 tick42blpBridge_close (mamaBridge bridgeImpl)
 {
-	
-	BlpSystemGlobal::gSystemShutdown.set(1); // Change the system state to shutdown 
-	BlpSystemGlobal::gMsgCbLock.wait(); //Once locked here, the gMsgCbLock is never released (post).
 
-	mama_status     status = MAMA_STATUS_OK;
-	mamaBridgeImpl* impl   = NULL;
+    BlpSystemGlobal::gSystemShutdown.set(1); // Change the system state to shutdown
+    BlpSystemGlobal::gMsgCbLock.wait(); //Once locked here, the gMsgCbLock is never released (post).
 
-	mama_log (MAMA_LOG_LEVEL_FINEST, "tick42blpBridge_close(): Entering.");
+    mama_status     status = MAMA_STATUS_OK;
+    mamaBridgeImpl* impl   = NULL;
 
-	BlpBridgeImpl* blpBridge = (BlpBridgeImpl*)bridgeImpl;
+    mama_log (MAMA_LOG_LEVEL_FINEST, "tick42blpBridge_close(): Entering.");
 
-	//mama_log (MAMA_LOG_LEVEL_FINER, "tick42blpBridge_stop(): Stopping bridge.");
-	//if (MAMA_STATUS_OK != (status = mamaBridgeImpl_getClosure((mamaBridge) mamaQueueImpl_getBridgeImpl(defaultEventQueue), (void**) &blpBridge))) {
-	//	mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not get Blp bridge object");
-	//	return status;
-	//}
+    BlpBridgeImpl* blpBridge = (BlpBridgeImpl*)bridgeImpl;
+
+    //mama_log (MAMA_LOG_LEVEL_FINER, "tick42blpBridge_stop(): Stopping bridge.");
+    //if (MAMA_STATUS_OK != (status = mamaBridgeImpl_getClosure((mamaBridge) mamaQueueImpl_getBridgeImpl(defaultEventQueue), (void**) &blpBridge))) {
+    //	mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not get Blp bridge object");
+    //	return status;
+    //}
 
 
-	//if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Stop())) {
-	//	mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not stop dispatching on Blp %d", status);
-	//	return status;
-	//}
+    //if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Stop())) {
+    //	mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not stop dispatching on Blp %d", status);
+    //	return status;
+    //}
 
-	
-	// Destroy queues and timers. Cleanup sockets
-	impl =  (mamaBridgeImpl*)bridgeImpl;
 
-	//BlpBridgeImpl* blpBridge = NULL;
+    // Destroy queues and timers. Cleanup sockets
+    impl =  (mamaBridgeImpl*)bridgeImpl;
 
-	if (0 != destroyHeap (gTimerHeap))
-	{
-		mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_close():"
-				"Failed to destroy Blp timer heap.");
-		status = MAMA_STATUS_PLATFORM;
-	}
-	
-	gPublisher_MamaQueue = NULL;
-	mamaQueue_destroyWait(impl->mDefaultEventQueue);
-	
-	free (impl);
-	wsocketcleanup();
-	
-	return status;
+    //BlpBridgeImpl* blpBridge = NULL;
+
+    if (0 != destroyHeap (gTimerHeap))
+    {
+        mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_close():"
+                "Failed to destroy Blp timer heap.");
+        status = MAMA_STATUS_PLATFORM;
+    }
+
+    gPublisher_MamaQueue = NULL;
+    mamaQueue_destroyWait(impl->mDefaultEventQueue);
+
+    free (impl);
+    wsocketcleanup();
+
+    return status;
 }
 
 
 mama_status
 tick42blpBridge_start(mamaQueue defaultEventQueue)
 {
-	mama_status status = MAMA_STATUS_OK;
+    mama_status status = MAMA_STATUS_OK;
     BlpBridgeImpl* blpBridge = NULL;
 
     mama_log (MAMA_LOG_LEVEL_FINER, "tick42blpBridge_start(): Start dispatching on default event queue.");
@@ -220,18 +208,18 @@ tick42blpBridge_start(mamaQueue defaultEventQueue)
         return status;
     }
 
-	if(blpBridge->getTransportBridge()== 0)
-	{
-		// just return for the moment and the transport bridge create will call start
-		    return mamaQueue_dispatch(defaultEventQueue);
-		//return MAMA_STATUS_OK;
-	}
+    if(blpBridge->getTransportBridge()== 0)
+    {
+        // just return for the moment and the transport bridge create will call start
+            return mamaQueue_dispatch(defaultEventQueue);
+        //return MAMA_STATUS_OK;
+    }
 
-	if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Start()))
-	{
-		//can just wait and start on transport create
+    if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Start()))
+    {
+        //can just wait and start on transport create
         mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_start(): Could not start dispatching on Blp");
-		return status;
+        return status;
 
     }
 
@@ -250,14 +238,14 @@ tick42blpBridge_stop(mamaQueue defaultEventQueue)
     if (MAMA_STATUS_OK != (status = mamaBridgeImpl_getClosure((mamaBridge) mamaQueueImpl_getBridgeImpl(defaultEventQueue), (void**) &blpBridge))) {
         mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not get Blp bridge object");
         return status;
-	}
+    }
 
 
-	 //if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Stop())) {
-	 //mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not stop dispatching on Blp %d", status);
-	 //return status;
-	 //}
-	 
+     //if (MAMA_STATUS_OK != (status = blpBridge->getTransportBridge()->Stop())) {
+     //mama_log (MAMA_LOG_LEVEL_ERROR, "tick42blpBridge_stop(): Could not stop dispatching on Blp %d", status);
+     //return status;
+     //}
+
     // stop Mama event loop
     status = mamaQueue_stopDispatch (defaultEventQueue);
     if (status != MAMA_STATUS_OK)

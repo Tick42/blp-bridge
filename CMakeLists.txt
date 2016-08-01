@@ -36,9 +36,9 @@ set (Boost_DIR "$ENV{TICK42_BOOST}")
 message ("Boost root is " ${Boost_DIR})
 
 set (Boost_MULTITHREADED TRUE)
-set (Boost_USE_STATIC_LIBS FALSE)
+set (Boost_USE_STATIC_LIBS TRUE)
 
-find_package (Boost 1.54 REQUIRED date_time filesystem  system thread)
+find_package (Boost 1.54 REQUIRED date_time filesystem system thread)
 
 add_definitions (-DBOOST_FILESYSTEM_VERSION=3 -DBOOST_FILESYSTEM_NO_DEPRECATED)
 
@@ -49,16 +49,31 @@ link_directories (${Boost_LIBRARY_DIRS})
 # Compiler C++11/0x support
 #--------------------------------------------------------------------------------------------------
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-   SET(ENABLE_CXX11 "-std=c++11")
+option(BOOST_NAMESPACES "Use of BOOST namespaces for c++0x support" FALSE)
 
-   EXECUTE_PROCESS(COMMAND "${CMAKE_CXX_COMPILER} -dumpversion" OUTPUT_VARIABLE GCC_VERSION)
-   if (GCC_VERSION VERSION_LESS 4.7)
-      SET(ENABLE_CXX11 "-std=c++0x")
-   endif()
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.3)
+   set (ENABLE_CXX11 "-std=c++0x")
 
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ENABLE_CXX11}")
+   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.7)
+       set (ENABLE_CXX11 "-std=c++11")
+   endif ()
+
+   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ENABLE_CXX11}")
+else ()
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    else()
+        set (BOOST_NAMESPACES TRUE CACHE)
+    endif()
+endif ()
+
+if(${BOOST_NAMESPACES})
+    add_definitions(-DBOOST_NAMESPACES)
+else()
+    add_definitions(-DSTD_NAMESPACES)
 endif()
+
+set (CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
 
 #--------------------------------------------------------------------------------------------------
 # Compiler
@@ -74,7 +89,7 @@ endfunction()
 
 set (PEDANTIC OFF CACHE BOOL "$Enable lots of warnings")
 
-add_compiler_flag_if_supported(-Werror werror)
+#add_compiler_flag_if_supported(-Werror werror)
 add_compiler_flag_if_supported(-Wwrite-strings wwrite_strings)
 add_compiler_flag_if_supported(-Wreturn-type wreturn_type)
 add_compiler_flag_if_supported(-Wunused-value wunused_value)
@@ -84,10 +99,11 @@ add_compiler_flag_if_supported(-Wcomment wcomment)
 add_compiler_flag_if_supported(-Wtype-limits type_limits)
 add_compiler_flag_if_supported(-Wempty-body empty_body)
 add_compiler_flag_if_supported(-Waddress  waddress)
+add_compiler_flag_if_supported(-fPIC fPIC)
 
 if (PEDANTIC)
   add_compiler_flag_if_supported(-Wall wall)
-  #add_compiler_flag_if_supported(-Wextra wextra)
+  add_compiler_flag_if_supported(-Wextra wextra)
   add_compiler_flag_if_supported(-Wuninitialized wuninitialized)
   add_compiler_flag_if_supported(-Wsign-compare  wsign_compare)
   add_compiler_flag_if_supported(-Wchar-subscripts char_subscipts)
@@ -99,15 +115,15 @@ endif()
 
 set (DUMP_VARIABLES OFF CACHE BOOL "Dump all variables")
 if (DUMP_VARIABLES)
-	get_cmake_property(_variableNames VARIABLES)
-	foreach (_variableName ${_variableNames})
-	    message("${_variableName}=${${_variableName}}")
-	endforeach()
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message("${_variableName}=${${_variableName}}")
+    endforeach()
 endif()
 #--------------------------------------------------------------------------------------------------
 # Sub projects
 #--------------------------------------------------------------------------------------------------
-                                        
+
 add_subdirectory(tick42blpmsg)
 add_subdirectory(tick42blp)
 

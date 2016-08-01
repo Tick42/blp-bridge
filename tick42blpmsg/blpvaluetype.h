@@ -32,27 +32,29 @@
 struct mama_datetime
 {
 
-	uint64_t dt;
-	friend std::ostream & operator<<(std::ostream& out, const mama_datetime & val);
-	
+    uint64_t dt;
+    friend std::ostream & operator<<(std::ostream& out, const mama_datetime & val);
+
 };
 
 
 
 
 
-typedef boost::variant<int8_t, 
-					   uint8_t, 
-					   int16_t, 
-					   uint16_t, 
-					   int32_t, 
-					   uint32_t, 
-					   int64_t, 
-					   uint64_t, 
-					   float, 
-					   double,
-					   mama_datetime,
-					   std::string> ValueType_t;
+typedef boost::variant<int8_t,
+                       uint8_t,
+                       int16_t,
+                       uint16_t,
+                       int32_t,
+                       uint32_t,
+                       int64_t,
+                       uint64_t,
+                       float,
+                       double,
+                       char,
+                       const char*,
+                       mama_datetime,
+                       std::string> ValueType_t;
 
 
 #endif
